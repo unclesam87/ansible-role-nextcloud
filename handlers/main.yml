@@ -1,18 +1,24 @@
 ---
+
 - name: Test and reload apache2
   ansible.builtin.command: apache2ctl configtest
   changed_when: True
   notify: Reload apache2
+  listen: Test and reload webserver
+  when: nextcloud_webserver == 'apache2'
 
 - name: Test and restart apache2
   ansible.builtin.command: apache2ctl configtest
   changed_when: True
   notify: Restart apache2
+  listen: Test and restart webserver
+  when: nextcloud_webserver == 'apache2'
 
 - name: Reload apache2
   ansible.builtin.service:
     name: apache2
     state: reloaded
+  when: nextcloud_webserver == 'apache2'
 
 - name: Restart apache2
   ansible.builtin.service:
@@ -20,6 +26,35 @@
     state: restarted
   notify:
     - Restart php-fpm
+  when: nextcloud_webserver == 'apache2'
+
+- name: Test and reload nginx
+  ansible.builtin.command: nginx -t
+  changed_when: True
+  notify: Reload nginx
+  listen: Test and reload webserver
+  when: nextcloud_webserver == 'nginx'
+
+- name: Test and restart nginx
+  ansible.builtin.command: nginx -t
+  changed_when: True
+  notify: Restart nginx
+  listen: Test and restart webserver
+  when: nextcloud_webserver == 'nginx'
+
+- name: Reload nginx
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded
+  when: nextcloud_webserver == 'nginx'
+
+- name: Restart nginx
+  ansible.builtin.service:
+    name: nginx
+    state: restarted
+  notify:
+    - Restart php-fpm
+  when: nextcloud_webserver == 'nginx'
 
 - name: Restart nextcloud-notify-push
   ansible.builtin.service:
@@ -30,4 +65,6 @@
   ansible.builtin.service:
     name: "php{{ nextcloud_php_version }}-fpm"
     state: restarted
-  when: __nextcloud_php_fpm_bin and __nextcloud_php_fpm_bin.stat.exists
+  when:
+    - __nextcloud_php_fpm_bin is defined
+    - __nextcloud_php_fpm_bin.stat.exists

@@ -30,7 +30,7 @@
     --no-warnings
   args:
     chdir: "{{ nextcloud_dl_tmp_dir }}/nextcloud"
-  notify: Test and restart apache2
+  notify: Test and restart webserver
   changed_when: True
 
 - name: "Nextcloud upgrade: run occ db:{{ item }}"
