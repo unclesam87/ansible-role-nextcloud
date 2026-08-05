@@ -62,8 +62,10 @@ nextcloud_config:
 #         }}
 # ```
 
-# Configure the Apache2 php.ini automatically?
-nextcloud_apache_php: yes
+# Supported values: apache2, nginx, none
+nextcloud_webserver: apache2
+
+# Configure Apache-specific PHP values in .htaccess?
 
 nextcloud_php_version: "{{ '8.4' if ansible_distribution_major_version | int >= 13 else '8.2' }}"
 
